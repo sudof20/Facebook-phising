@@ -95,15 +95,4 @@ SOFTWARE.
 ---
 
 🔗 **Repository Link**:  
-[`https://github.com/sudof20/Facebook-phising`](https://github.com/sudof20/Facebook-phising)  
-
----
-
-### Key Changes Made:
-1. Added your name (`sudof20`) and year (`2025`) in the copyright section
-2. Included the full MIT License text with your details
-3. Maintained all the original content and structure
-4. Kept all links properly formatted and separated from regular text
-5. Preserved all warnings and educational disclaimers
-
-The file is now ready to use with your proper copyright information while maintaining all the original functionality and clarity.
+[`https://github.com/sudof20/Facebook-phising`](https://github.com/sudof20/Facebook-phising)
