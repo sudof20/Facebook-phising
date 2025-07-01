@@ -15,14 +15,13 @@ This is a simple web application built using Python’s `http.server` module. It
 Clone the repository and run the app
 
 ```bash
-git clone https://github.com/sudof20/Facebook-phising.git
+1.git clone https://github.com/sudof20/Facebook-phising.git
 cd Facebook-phising
-chmod +x start.sh
-./start.sh
+2.chmod +x start.sh
+3../start.sh
 
-After starting, you should see a message in the terminal indicating that the server is running.
-🌐 Usage
-
+(After starting, you should see a message in the terminal indicating that the server is running.
+🌐 Usage)
 Once the server is running, open a web browser and go to the following URLs:
 
 🔐 Login Page:
